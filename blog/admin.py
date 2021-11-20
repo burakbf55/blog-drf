@@ -1,12 +1,16 @@
 from django.contrib import admin
-from blog.models import Post, Comments
+
+from blog.models import Comments, Post
+
 # Register your models here.
+
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ("title","description","tags")
+    list_display = ("title", "description", "tags")
     search_fields = ("title",)
-    readonly_fields = ("created_at","updated_at")
-    #fieldsets eklenecek
+    readonly_fields = ("created_at", "updated_at")
+    # fieldsets eklenecek
+
 
 admin.site.register(Comments)

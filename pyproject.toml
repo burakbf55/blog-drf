@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 119
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  |  \env
+  | _build
+  | build
+  | dist
+  | .+/migrations
+)/
+'''
+
+[tool.isort]
+line_length = 119
+skip_gitignore = true
+skip_glob = "*/migrations/*.py"

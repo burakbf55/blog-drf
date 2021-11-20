@@ -13,6 +13,7 @@ class SessionStore(DBStore):
     """
     Implement cached, database backed sessions.
     """
+
     cache_key_prefix = KEY_PREFIX
 
     def __init__(self, session_key=None):

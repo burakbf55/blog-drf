@@ -29,10 +29,7 @@ def get_callable(lookup_view):
     except ImportError:
         parentmod, submod = get_mod_func(mod_name)
         if submod and not module_has_submodule(import_module(parentmod), submod):
-            raise ViewDoesNotExist(
-                "Could not import '%s'. Parent module %s does not exist." %
-                (lookup_view, mod_name)
-            )
+            raise ViewDoesNotExist("Could not import '%s'. Parent module %s does not exist." % (lookup_view, mod_name))
         else:
             raise
     else:
@@ -40,15 +37,11 @@ def get_callable(lookup_view):
             view_func = getattr(mod, func_name)
         except AttributeError:
             raise ViewDoesNotExist(
-                "Could not import '%s'. View does not exist in module %s." %
-                (lookup_view, mod_name)
+                "Could not import '%s'. View does not exist in module %s." % (lookup_view, mod_name)
             )
         else:
             if not callable(view_func):
-                raise ViewDoesNotExist(
-                    "Could not import '%s.%s'. View is not callable." %
-                    (mod_name, func_name)
-                )
+                raise ViewDoesNotExist("Could not import '%s.%s'. View is not callable." % (mod_name, func_name))
             return view_func
 
 
@@ -56,7 +49,7 @@ def get_mod_func(callback):
     # Convert 'django.views.news.stories.story_detail' to
     # ['django.views.news.stories', 'story_detail']
     try:
-        dot = callback.rindex('.')
+        dot = callback.rindex(".")
     except ValueError:
-        return callback, ''
-    return callback[:dot], callback[dot + 1:]
+        return callback, ""
+    return callback[:dot], callback[dot + 1 :]

@@ -1,13 +1,12 @@
-from django.db import models
-
 # Create your models here.
 from ckeditor.fields import RichTextField
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class BaseContent(models.Model):
     title = models.CharField(max_length=255, unique=True)
@@ -17,7 +16,7 @@ class BaseContent(models.Model):
     tags = TaggableManager()
     is_active = models.BooleanField(default=True)
     slug = models.SlugField()
-    #Abstract Class'da class meta deyip abstract = True atamamız lazım.
+    # Abstract Class'da class meta deyip abstract = True atamamız lazım.
     class Meta:
         abstract = True
 
@@ -34,7 +33,8 @@ class Post(BaseContent):
 
     def __str__(self) -> str:
         return self.author
-    #SİGNAL KULLANARAK OLUŞTUR
+
+    # SİGNAL KULLANARAK OLUŞTUR
     def save(self, *args, **kwargs) -> None:
         if not self.pk:
             self.slug = slugify(self.title)
@@ -54,4 +54,5 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.content
-    #ordering ekle
+
+    # ordering ekle

@@ -35,7 +35,7 @@ def get_citext_oids(connection_alias):
 
 
 def register_type_handlers(connection, **kwargs):
-    if connection.vendor != 'postgresql' or connection.alias == NO_DB_ALIAS:
+    if connection.vendor != "postgresql" or connection.alias == NO_DB_ALIAS:
         return
 
     try:
@@ -54,7 +54,7 @@ def register_type_handlers(connection, **kwargs):
 
     try:
         citext_oids = get_citext_oids(connection.alias)
-        array_type = psycopg2.extensions.new_array_type(citext_oids, 'citext[]', psycopg2.STRING)
+        array_type = psycopg2.extensions.new_array_type(citext_oids, "citext[]", psycopg2.STRING)
         psycopg2.extensions.register_type(array_type, None)
     except ProgrammingError:
         # citext is not available on the database.

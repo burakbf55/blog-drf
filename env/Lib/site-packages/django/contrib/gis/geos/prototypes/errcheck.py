@@ -8,7 +8,7 @@ from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.
-free = GEOSFuncFactory('GEOSFree')
+free = GEOSFuncFactory("GEOSFree")
 free.argtypes = [c_void_p]
 
 

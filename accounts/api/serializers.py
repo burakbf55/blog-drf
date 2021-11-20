@@ -3,15 +3,17 @@ from rest_framework import serializers
 
 User = get_user_model()
 
+
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(read_only = True)
-    password = serializers.CharField(min_length=8, max_length=16, write_only = True)
-    email = serializers.EmailField(max_length = 50, allow_blank = False)
+    id = serializers.PrimaryKeyRelatedField(read_only=True)
+    password = serializers.CharField(min_length=8, max_length=16, write_only=True)
+    email = serializers.EmailField(max_length=50, allow_blank=False)
 
     class Meta:
         model = User
-        fields = ["id","username","password","email"]
-    def create(self,validated_data):
+        fields = ["id", "username", "password", "email"]
+
+    def create(self, validated_data):
         username = validated_data["username"]
         email = validated_data["email"]
         password = validated_data["password"]
@@ -19,4 +21,3 @@ class UserSerializer(serializers.ModelSerializer):
         user_obj.set_password(password)
         user_obj.save()
         return user_obj
-    
