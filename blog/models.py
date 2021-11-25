@@ -1,11 +1,11 @@
 # Create your models here.
 from ckeditor.fields import RichTextField
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
 
-User = get_user_model()
+# User = get_user_model()
 
 
 class BaseContent(models.Model):
@@ -30,9 +30,11 @@ class Post(BaseContent):
         default="not_found.jpg",
         blank=True,
     )
+    # STATUSES = Choices('new', 'verified', 'published', 'draft')
+    # status = models.IntegerField(choice=STATUSES, default=STATUSES.draft)
 
     def __str__(self) -> str:
-        return self.author
+        return str(self.author)
 
     # SİGNAL KULLANARAK OLUŞTUR
     def save(self, *args, **kwargs) -> None:
@@ -42,17 +44,23 @@ class Post(BaseContent):
 
     class Meta:
         verbose_name = "post"
+
         verbose_name_plural = "posts"
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     parent = models.ForeignKey(Post, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment_owner = models.ForeignKey(User, on_delete=models.CASCADE)
     content = RichTextField()
     created = models.DateTimeField(auto_now_add=True)
-    uptated = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.content
+
+    class Meta:
+        verbose_name = "Yorum"
+        verbose_name_plural = "Yorumlar"
+        ordering = ["-created", "-updated"]
 
     # ordering ekle

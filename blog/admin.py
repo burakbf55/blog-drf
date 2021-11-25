@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from blog.models import Comments, Post
+from blog.models import Comment, Post
 
 # Register your models here.
 
@@ -13,4 +13,4 @@ class PostAdmin(admin.ModelAdmin):
     # fieldsets eklenecek
 
 
-admin.site.register(Comments)
+admin.site.register(Comment)

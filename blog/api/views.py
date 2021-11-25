@@ -1,17 +1,29 @@
+from blog.api.paginations import PostPagination
+from blog.api.permissions import IsCommentUserReadOnly
+from blog.api.serializers import (
+    CommentCreateUpdateSerializer,
+    PostDetailSerializer,
+    PostSerializer,
+    PostUpdateCreateSerializer,
+)
+from blog.models import Comment, Post
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics, mixins
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    get_object_or_404,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
-
-from blog.api.paginations import PostPagination
-from blog.api.serializers import PostDetailSerializer, PostSerializer, PostUpdateCreateSerializer
-from blog.models import Comments, Post
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 
 class PostViewSet(ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(is_active=True)
     serializer_class = PostSerializer
     pagination_class = PostPagination
     lookup_field = "slug"
@@ -26,7 +38,7 @@ class PostViewSet(ModelViewSet):
 
 
 class CreatePostApiViews(mixins.CreateModelMixin, mixins.RetrieveModelMixin, GenericAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(is_active=True)
     serializer_class = PostUpdateCreateSerializer
     # postu yazana custom permission eklenecek
     # permissions_classes = [IsAuthenticated]
@@ -48,3 +60,40 @@ class DetailPostAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     lookup_field = "slug"
+
+
+class CommentCreateUpdateViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+):
+    serializer_class = CommentCreateUpdateSerializer
+    queryset = Comment.objects.all()
+
+
+class CreateCommentApiView(
+    mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, GenericAPIView
+):
+    queryset = Comment.objects.all()
+    serializer_class = CommentCreateUpdateSerializer
+    permissions_classes = [IsCommentUserReadOnly]
+
+    def perform_create(self, serializer):
+        post_pk = self.kwargs.get("post_pk")
+        post = get_object_or_404(Post, pk=post_pk)
+        user = self.request.user
+        comments = Comment.objects.filter(post=post, comment_owner=user)
+        if comments.exists():
+            raise ValidationError("Bir posta sadece bir yorum yazabilirsiniz.")
+        serializer.save(post=post, comment_owner=user)
+
+    # def post(self, request, slug, *args, **kwargs):
+    #     post = get_object_or_404(Post, slug=slug)
+    #     serializer = CreateCommentUpdateSerializer(data=request.data)
+    #     if serializer.is_valid(raise_exception=True):
+    #         serializer.save(author=request.user, parent=post)
+    #         return Response(serializer.data, status=200)
+    #     else:
+    #         return Response({"errors": serializer.errors}, status=400)
