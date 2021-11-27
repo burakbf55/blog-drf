@@ -1,7 +1,10 @@
 # Create your models here.
+from blogcore.utils import unique_slug_generator
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
 
@@ -9,13 +12,13 @@ from taggit.managers import TaggableManager
 
 
 class BaseContent(models.Model):
-    title = models.CharField(max_length=255, unique=True)
+    title = models.CharField(max_length=255)
     description = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = TaggableManager()
     is_active = models.BooleanField(default=True)
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=250, null=True, blank=True)
     # Abstract Class'da class meta deyip abstract = True atamamız lazım.
     class Meta:
         abstract = True
@@ -64,3 +67,11 @@ class Comment(models.Model):
         ordering = ["-created", "-updated"]
 
     # ordering ekle
+
+
+def slug_generator(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = unique_slug_generator(instance)
+
+
+pre_save.connect(slug_generator, sender=Post)

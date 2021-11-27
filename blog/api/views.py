@@ -1,3 +1,4 @@
+import django_filters.rest_framework
 from blog.api.paginations import PostPagination
 from blog.api.permissions import IsCommentUserReadOnly
 from blog.api.serializers import (
@@ -10,6 +11,7 @@ from blog.models import Comment, Post
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics, mixins
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
@@ -28,6 +30,7 @@ class PostViewSet(ModelViewSet):
     pagination_class = PostPagination
     lookup_field = "slug"
     search_fields = ("title", "description")
+    filter_backends = [SearchFilter]
 
     def get_serializer_class(self):
         if self.action == "update":
@@ -42,6 +45,7 @@ class CreatePostApiViews(mixins.CreateModelMixin, mixins.RetrieveModelMixin, Gen
     serializer_class = PostUpdateCreateSerializer
     # postu yazana custom permission eklenecek
     # permissions_classes = [IsAuthenticated]
+
     def perfom_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -50,9 +54,12 @@ class ListPostAPIView(ListAPIView):
     serializer_class = PostSerializer
     pagination_class = PostPagination
     search_fields = ["title", "description"]
+    # filter_backends = [SearchFilter]
+
     # filter_backends ekle
-    # def get_queryset(self):
-    #     return Post.objects.all()
+    def get_queryset(self):
+        return Post.objects.all()
+
     queryset = Post.objects.all()
 
 
